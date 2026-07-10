@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Send This To Your Crush</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ─── VERSION WIDGET ─── */
+  #v-widget {
+    position: fixed; bottom: 20px; right: 20px; z-index: 99999;
+  }
+  #v-widget-toggle {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(20,20,20,.85); border: 1px solid rgba(255,255,255,.15);
+    color: #fff; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    transition: transform .2s;
+    line-height: 1;
+  }
+  #v-widget-toggle:hover { transform: scale(1.1); }
+  #v-widget-menu {
+    position: absolute; bottom: 54px; right: 0;
+    background: rgba(15,15,15,.92); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px; padding: 8px; min-width: 148px;
+    backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    display: none; flex-direction: column; gap: 4px;
+  }
+  #v-widget-menu.open { display: flex; }
+  #v-widget-menu button {
+    padding: 9px 14px; border-radius: 8px; border: none; background: transparent;
+    color: #ccc; font-size: 13px; cursor: pointer; text-align: left;
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    transition: background .15s, color .15s; white-space: nowrap;
+  }
+  #v-widget-menu button:hover    { background: rgba(255,255,255,.08); color: #fff; }
+  #v-widget-menu button.vm-mature  { color: #c9a96e; }
+  #v-widget-menu button.vm-genz    { color: #a259ff; }
+  #v-widget-menu button.vm-quirky  { color: #ff69b4; }
+  #v-widget-menu button.vm-active  { background: rgba(255,255,255,.1); }
+
+  .version-panel { display: none; min-height: 100vh; }
+  .version-panel.active { display: block; }
+
+  /* ══════════════════════════════════════════
+     VERSION 1 — MATURE / MODERN
+  ══════════════════════════════════════════ */
+  #v-mature {
+    background: #0c0c14; color: #e8e0d0;
+    font-family: 'Georgia', serif;
+  }
+  .m-hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 60px 24px;
+    position: relative; overflow: hidden;
+  }
+  .m-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 60%, rgba(180,100,80,.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .m-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .m-particle {
+    position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    background: rgba(201,169,110,.5); animation: mfloat linear infinite;
+  }
+  @keyframes mfloat {
+    0%   { transform: translateY(110vh) scale(0); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: .6; }
+    100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+  }
+  .m-eyebrow {
+    font-size: 11px; letter-spacing: .25em; text-transform: uppercase;
+    color: #c9a96e; margin-bottom: 28px; opacity: .8;
+  }
+  .m-title {
+    font-size: clamp(2rem, 6vw, 4rem); font-weight: 400;
+    line-height: 1.2; color: #f0e8d8; margin-bottom: 20px; letter-spacing: -.01em;
+  }
+  .m-title em { color: #c9a96e; font-style: italic; }
+  .m-subtitle {
+    font-size: clamp(.95rem, 2.5vw, 1.15rem); color: #b0a090;
+    max-width: 480px; line-height: 1.75; margin-bottom: 48px;
+  }
+  .m-heart-wrap { margin-bottom: 48px; }
+  .m-heart-svg {
+    width: 64px; height: 64px; fill: #c9a96e;
+    animation: m-pulse 2.4s ease-in-out infinite;
+    filter: drop-shadow(0 0 18px rgba(201,169,110,.45));
+  }
+  @keyframes m-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  .m-btn {
+    display: inline-block; padding: 15px 42px;
+    border: 1px solid #c9a96e; color: #c9a96e;
+    background: transparent; font-family: inherit;
+    font-size: 14px; letter-spacing: .12em; text-transform: uppercase;
+    cursor: pointer; transition: all .35s; text-decoration: none;
+    position: relative; overflow: hidden; z-index: 0;
+  }
+  .m-btn::after {
+    content: ''; position: absolute; inset: 0;
+    background: #c9a96e; transform: scaleX(0); transform-origin: left;
+    transition: transform .35s ease; z-index: -1;
+  }
+  .m-btn:hover { color: #0c0c14; }
+  .m-btn:hover::after { transform: scaleX(1); }
+  .m-love-meter { width: 100%; max-width: 420px; margin: 0 auto 48px; }
+  .m-love-label {
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: #8a7a6a; margin-bottom: 12px; display: flex; justify-content: space-between;
+  }
+  .m-track { height: 2px; background: rgba(201,169,110,.15); position: relative; overflow: visible; }
+  .m-fill {
+    height: 100%; background: linear-gradient(90deg,#c9a96e,#e8c87a);
+    width: 0%; transition: width 1.2s cubic-bezier(.4,0,.2,1); position: relative;
+  }
+  .m-fill::after {
+    content: ''; position: absolute; right: -5px; top: -4px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #c9a96e; box-shadow: 0 0 12px #c9a96e;
+  }
+  .m-pct { font-size: 13px; color: #c9a96e; margin-top: 10px; letter-spacing: .1em; }
+  .m-quote {
+    max-width: 400px; margin: 0 auto 60px;
+    font-size: 1.05rem; line-height: 1.8; color: #a09080; font-style: italic;
+    border-left: 1px solid #c9a96e40; padding-left: 20px; text-align: left;
+  }
+  .m-quote cite {
+    display: block; font-size: .78rem; letter-spacing: .15em;
+    text-transform: uppercase; color: #c9a96e80; margin-top: 10px; font-style: normal;
+  }
+
+  /* ══════════════════════════════════════════
+     VERSION 2 — GEN Z
+  ══════════════════════════════════════════ */
+  #v-genz {
+    background: #0d0d0d; color: #f0f0f0;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  }
+  .gz-hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 20px; text-align: center; position: relative; overflow: hidden;
+  }
+  .gz-blob {
+    position: absolute; border-radius: 50%; filter: blur(80px);
+    animation: gzdrift 8s ease-in-out infinite alternate; pointer-events: none;
+  }
+  .gz-blob-1 { width:400px;height:400px;background:rgba(162,89,255,.25);top:-100px;left:-80px;animation-delay:0s; }
+  .gz-blob-2 { width:350px;height:350px;background:rgba(255,100,150,.2);bottom:-80px;right:-60px;animation-delay:-3s; }
+  .gz-blob-3 { width:200px;height:200px;background:rgba(0,200,255,.15);top:40%;left:50%;animation-delay:-6s; }
+  @keyframes gzdrift { from{transform:translate(0,0) scale(1)} to{transform:translate(30px,20px) scale(1.08)} }
+  .gz-tag {
+    display: inline-block; padding: 4px 12px; border-radius: 99px;
+    background: rgba(162,89,255,.2); border: 1px solid #a259ff60;
+    color: #a259ff; font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; margin-bottom: 24px;
+  }
+  .gz-title {
+    font-size: clamp(2rem,7vw,4.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 16px;
+    background: linear-gradient(135deg,#fff 30%,#a259ff,#ff6496);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .gz-sub { font-size: clamp(.9rem,2.5vw,1.1rem); color:#888; max-width:440px; line-height:1.6; margin-bottom:36px; }
+  .gz-sub span { color:#a259ff; }
+  .gz-card {
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+    border-radius:20px; padding:28px 32px; max-width:440px; width:100%;
+    margin:0 auto 36px; backdrop-filter:blur(12px); text-align:left;
+  }
+  .gz-card-title { font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:#666; margin-bottom:16px; }
+  .gz-meter-track { height:6px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; margin-bottom:8px; }
+  .gz-meter-fill {
+    height:100%; border-radius:99px; width:0%;
+    background:linear-gradient(90deg,#a259ff,#ff6496);
+    transition:width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .gz-meter-label { font-size:12px; color:#666; display:flex; justify-content:space-between; }
+  .gz-meter-pct { color:#a259ff; font-weight:600; }
+  .gz-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:32px; }
+  .gz-btn-primary {
+    padding:13px 32px; border-radius:12px; border:none;
+    background:linear-gradient(135deg,#a259ff,#ff6496);
+    color:#fff; font-size:14px; font-weight:600; cursor:pointer;
+    font-family:inherit; transition:opacity .2s,transform .2s;
+    text-decoration:none; display:inline-block;
+  }
+  .gz-btn-primary:hover { opacity:.85; transform:translateY(-2px); }
+  .gz-btn-ghost {
+    padding:13px 32px; border-radius:12px; border:1px solid rgba(255,255,255,.15);
+    background:transparent; color:#ccc; font-size:14px; font-weight:500;
+    cursor:pointer; font-family:inherit; transition:border-color .2s,transform .2s;
+    text-decoration:none; display:inline-block;
+  }
+  .gz-btn-ghost:hover { border-color:rgba(255,255,255,.4); transform:translateY(-2px); }
+  .gz-reactions { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:32px; }
+  .gz-react {
+    padding:8px 14px; border-radius:99px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+    font-size:18px; cursor:pointer; transition:transform .15s,background .15s; line-height:1;
+  }
+  .gz-react:hover { background:rgba(255,255,255,.12); transform:scale(1.15); }
+  .gz-react.selected { background:rgba(162,89,255,.25); border-color:#a259ff; }
+  .gz-footer-text { font-size:12px; color:#444; letter-spacing:.05em; }
+
+  /* ══════════════════════════════════════════
+     VERSION 3 — QUIRKY / CRINGE
+  ══════════════════════════════════════════ */
+  #v-quirky {
+    background: #fff0f5;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+    position: relative; overflow-x: hidden;
+  }
+  .qk-marquee-top {
+    background: #ff69b4; color: #fff; padding: 8px 0;
+    font-size: 14px; white-space: nowrap; overflow: hidden;
+    border-bottom: 3px dashed #ff0066;
+  }
+  .qk-marquee-inner { display: inline-block; animation: qkmarquee 12s linear infinite; }
+  @keyframes qkmarquee { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
+  .qk-hero { text-align:center; padding:30px 20px; position:relative; }
+  .qk-confetti-wrap { position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+  .qk-dot {
+    position:absolute; border-radius:50%;
+    animation:qkfall linear infinite; pointer-events:none;
+  }
+  @keyframes qkfall {
+    0%  { transform:translateY(-20px) rotate(0deg); opacity:1; }
+    100%{ transform:translateY(110vh) rotate(720deg); opacity:.3; }
+  }
+  .qk-danger {
+    background:#ff0000; color:#ffff00;
+    border:4px solid #000; padding:12px 20px;
+    font-size:clamp(1rem,4vw,1.4rem); font-weight:900;
+    text-transform:uppercase; margin-bottom:20px;
+    box-shadow:6px 6px 0 #000; display:inline-block;
+    animation:qkshake .4s infinite; letter-spacing:.05em;
+  }
+  @keyframes qkshake { 0%,100%{transform:rotate(-1deg)} 50%{transform:rotate(1deg)} }
+  .qk-title {
+    font-size:clamp(1.6rem,7vw,3.8rem); color:#ff0066; margin-bottom:10px;
+    text-shadow:3px 3px 0 #ffcc00,6px 6px 0 #ff69b4;
+    animation:qkbounce .6s ease-in-out infinite alternate;
+  }
+  @keyframes qkbounce { from{transform:translateY(0)} to{transform:translateY(-8px)} }
+  .qk-subtitle { font-size:clamp(1rem,3vw,1.3rem); color:#333; margin-bottom:24px; line-height:1.6; }
+  .qk-subtitle span { color:#ff0066; font-weight:900; }
+  .qk-heart-container { position:relative; display:inline-block; margin:20px auto; }
+  .qk-big-heart {
+    width:120px; height:120px; fill:#ff0066;
+    filter:drop-shadow(0 0 20px #ff006699);
+    animation:qkheartbeat .5s ease-in-out infinite; cursor:pointer;
+  }
+  @keyframes qkheartbeat {
+    0%,100%{transform:scale(1)} 25%{transform:scale(1.15)} 50%{transform:scale(.95)} 75%{transform:scale(1.08)}
+  }
+  .qk-click-hint { font-size:11px; color:#ff69b4; letter-spacing:.05em; margin-top:6px; animation:qkfade 1s ease-in-out infinite alternate; }
+  @keyframes qkfade { from{opacity:.4} to{opacity:1} }
+  .qk-meter-section { margin:24px auto; max-width:420px; padding:0 20px; }
+  .qk-meter-label { font-size:1rem; font-weight:900; color:#ff0066; margin-bottom:8px; text-align:center; }
+  .qk-track {
+    height:28px; border-radius:99px;
+    background:#ffd6e8; border:3px solid #ff69b4; overflow:hidden; position:relative;
+  }
+  .qk-fill {
+    height:100%; width:0%; border-radius:99px;
+    background:repeating-linear-gradient(45deg,#ff0066 0px,#ff0066 10px,#ff69b4 10px,#ff69b4 20px);
+    background-size:200% 100%;
+    transition:width 1s cubic-bezier(.4,0,.2,1);
+    animation:qkstripe 1s linear infinite;
+    display:flex; align-items:center; justify-content:flex-end; padding-right:8px;
+  }
+  @keyframes qkstripe { from{background-position:0 0} to{background-position:40px 0} }
+  .qk-fill-text { font-size:12px; font-weight:900; color:#fff; white-space:nowrap; }
+  .qk-meter-emoji { font-size:1.8rem; margin-top:6px; display:block; text-align:center; min-height:2rem; }
+  .qk-btns { display:flex; flex-direction:column; gap:14px; align-items:center; margin:24px 0; }
+  .qk-btn-yes {
+    padding:16px 48px; font-size:clamp(1rem,3vw,1.3rem); font-weight:900;
+    background:#ff0066; color:#fff; border:4px solid #000;
+    box-shadow:6px 6px 0 #000; font-family:inherit; cursor:pointer;
+    transition:transform .1s; text-decoration:none; display:inline-block;
+    animation:qkpulse 1.5s ease-in-out infinite;
+    text-transform:uppercase; letter-spacing:.05em;
+  }
+  .qk-btn-yes:hover { transform:translate(-3px,-3px); box-shadow:9px 9px 0 #000; }
+  .qk-btn-yes:active { transform:translate(3px,3px); box-shadow:3px 3px 0 #000; }
+  @keyframes qkpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+  .qk-btn-no {
+    padding:10px 28px; font-size:.85rem; font-weight:700;
+    background:#eee; color:#999; border:2px solid #ccc;
+    font-family:inherit; cursor:pointer; transition:all .2s; text-transform:uppercase;
+  }
+  .qk-facts {
+    background:#fff; border:3px dashed #ff69b4;
+    border-radius:16px; padding:20px 24px; max-width:440px;
+    margin:0 auto 24px; text-align:left;
+  }
+  .qk-facts h3 { color:#ff0066; font-size:1.1rem; margin-bottom:12px; text-align:center; text-transform:uppercase; }
+  .qk-fact { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; font-size:.9rem; line-height:1.5; }
+  .qk-fact-icon { font-size:1.2rem; flex-shrink:0; }
+  .qk-toast {
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:#ff0066; color:#fff; padding:12px 24px; border-radius:8px;
+    font-size:14px; font-weight:900; border:3px solid #000;
+    opacity:0; transition:all .3s; z-index:9998; white-space:nowrap;
+    box-shadow:4px 4px 0 #000; text-transform:uppercase;
+  }
+  .qk-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .qk-no-zone { position:relative; display:inline-block; }
+  .qk-float-heart {
+    position:fixed; pointer-events:none; z-index:2;
+    animation:qkfloatup linear forwards; font-size:1.5rem;
+  }
+  @keyframes qkfloatup {
+    0%  { transform:translateY(0) scale(1); opacity:1; }
+    100%{ transform:translateY(-300px) scale(.3); opacity:0; }
+  }
+
+  /* shared footer */
+  .made-by {
+    display:block; text-align:center; padding:18px 0 14px;
+    font-size:12px; color:#888; border-top:1px solid rgba(128,128,128,.15);
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+    letter-spacing:.03em; margin-top:40px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── VERSION WIDGET ─── -->
+<div id="v-widget">
+  <button id="v-widget-toggle" title="Switch version">💌</button>
+  <div id="v-widget-menu">
+    <button class="vm-mature" data-v="mature">✦ Mature</button>
+    <button class="vm-genz"   data-v="genz">⚡ Gen Z</button>
+    <button class="vm-quirky" data-v="quirky">💀 Quirky</button>
+    <button class="vm-og" data-v="og">❤️ OG Classic</button>
+  </div>
+</div>
+
+<!-- ════════════════════ VERSION 1 — MATURE ════════════════════ -->
+<div id="v-mature" class="version-panel">
+  <div class="m-hero">
+    <div class="m-particles" id="m-particles"></div>
+    <p class="m-eyebrow">A note, for you</p>
+    <h1 class="m-title">There's something I've been<br>meaning to tell you, <em>for a while.</em></h1>
+    <p class="m-subtitle">
+      It's not the grand gestures or the perfect words — it's the quiet moments
+      where I catch myself thinking about you and realise I don't want that to stop.
+    </p>
+    <div class="m-heart-wrap">
+      <svg class="m-heart-svg" viewBox="0 0 512 512">
+        <path d="M474.655,74.503C449.169,45.72,413.943,29.87,375.467,29.87c-30.225,0-58.5,12.299-81.767,35.566
+          c-15.522,15.523-28.33,35.26-37.699,57.931c-9.371-22.671-22.177-42.407-37.699-57.931
+          c-23.267-23.267-51.542-35.566-81.767-35.566c-38.477,0-73.702,15.851-99.188,44.634
+          C13.612,101.305,0,137.911,0,174.936c0,44.458,13.452,88.335,39.981,130.418
+          c21.009,33.324,50.227,65.585,86.845,95.889c62.046,51.348,123.114,78.995,125.683,80.146
+          c2.203,0.988,4.779,0.988,6.981,0c2.57-1.151,63.637-28.798,125.683-80.146
+          c36.618-30.304,65.836-62.565,86.845-95.889C498.548,263.271,512,219.394,512,174.936
+          C512,137.911,498.388,101.305,474.655,74.503z"/>
+      </svg>
+    </div>
+    <div class="m-love-meter">
+      <div class="m-love-label">
+        <span>How much do I think about you?</span>
+        <span id="m-pct-label">—</span>
+      </div>
+      <div class="m-track"><div class="m-fill" id="m-fill"></div></div>
+      <p class="m-pct" id="m-pct-sub"></p>
+    </div>
+    <button class="m-btn" id="m-measure-btn">Measure it</button>
+    <br><br>
+    <blockquote class="m-quote">
+      "I have waited for this day to come, rehearsed it a hundred times —
+      and yet here I am, choosing honesty over rehearsal.
+      I like you. Genuinely, quietly, completely."
+      <cite>— Someone who means it</cite>
+    </blockquote>
+    <a href="https://m.me/100011457304911?ref=I_Love_You_Too" class="m-btn">I feel the same way →</a>
+  </div>
+</div>
+
+<!-- ════════════════════ VERSION 2 — GEN Z ════════════════════ -->
+<div id="v-genz" class="version-panel">
+  <div class="gz-hero">
+    <div class="gz-blob gz-blob-1"></div>
+    <div class="gz-blob gz-blob-2"></div>
+    <div class="gz-blob gz-blob-3"></div>
+    <span class="gz-tag">⚡ not a bit, not a phase</span>
+    <h1 class="gz-title">ok so i kinda<br>fw you heavy rn</h1>
+    <p class="gz-sub">
+      no cap. like genuinely. i was gonna ghost this feeling but it <span>said no.</span><br>
+      so here we are bestie.
+    </p>
+    <div class="gz-card">
+      <div class="gz-card-title">AURA COMPATIBILITY CHECK™</div>
+      <div class="gz-meter-track"><div class="gz-meter-fill" id="gz-fill"></div></div>
+      <div class="gz-meter-label">
+        <span>their aura + my aura</span>
+        <span class="gz-meter-pct" id="gz-pct">tap to check</span>
+      </div>
+    </div>
+    <div class="gz-btns">
+      <button class="gz-btn-primary" id="gz-check-btn">run the vibe check ✦</button>
+      <a href="https://m.me/100011457304911?ref=I_Love_You_Too" class="gz-btn-ghost">accept &amp; slay 💅</a>
+    </div>
+    <div class="gz-reactions" id="gz-reactions">
+      <button class="gz-react" data-label="felt this">🫀</button>
+      <button class="gz-react" data-label="real talk">🤝</button>
+      <button class="gz-react" data-label="in my feels">🥺</button>
+      <button class="gz-react" data-label="understood">🫡</button>
+      <button class="gz-react" data-label="no thoughts">🧠</button>
+      <button class="gz-react" data-label="it's giving">✨</button>
+    </div>
+    <p class="gz-footer-text" id="gz-react-label">pick your reaction</p>
+  </div>
+
+</div>
+
+<!-- ════════════════════ VERSION 3 — QUIRKY ════════════════════ -->
+<div id="v-quirky" class="version-panel active">
+  <div class="qk-marquee-top">
+    <span class="qk-marquee-inner">
+      ❤️ WARNING: YOU ARE ABOUT TO FALL IN LOVE WITH ME ❤️ &nbsp;&nbsp;&nbsp;
+      THIS IS NOT A DRILL 🚨 &nbsp;&nbsp;&nbsp;
+      LOVE ATTACK IMMINENT 💘 &nbsp;&nbsp;&nbsp;
+      SCIENTISTS BAFFLED 🔬 &nbsp;&nbsp;&nbsp;
+      CUTE LEVEL: 9000 &nbsp;&nbsp;&nbsp;
+      YOUR HEART HAS BEEN LOCATED 📍 &nbsp;&nbsp;&nbsp;
+      ❤️ WARNING: YOU ARE ABOUT TO FALL IN LOVE WITH ME ❤️
+    </span>
+  </div>
+  <div class="qk-confetti-wrap" id="qk-confetti"></div>
+  <div class="qk-hero">
+    <div class="qk-danger">⚠️ DANGER! You will fall in love with me. ⚠️</div>
+    <h1 class="qk-title">💌 SEND THIS TO<br>YOUR CRUSH 💌</h1>
+    <p class="qk-subtitle">
+      (yes you, the one reading this)<br>
+      <span>I have calculated my feelings</span> using advanced math<br>
+      and the result is: <span>it's you. it's literally just you.</span>
+    </p>
+    <div class="qk-heart-container">
+      <svg class="qk-big-heart" id="qk-heart" viewBox="0 0 512 512">
+        <path d="M474.655,74.503C449.169,45.72,413.943,29.87,375.467,29.87c-30.225,0-58.5,12.299-81.767,35.566
+          c-15.522,15.523-28.33,35.26-37.699,57.931c-9.371-22.671-22.177-42.407-37.699-57.931
+          c-23.267-23.267-51.542-35.566-81.767-35.566c-38.477,0-73.702,15.851-99.188,44.634
+          C13.612,101.305,0,137.911,0,174.936c0,44.458,13.452,88.335,39.981,130.418
+          c21.009,33.324,50.227,65.585,86.845,95.889c62.046,51.348,123.114,78.995,125.683,80.146
+          c2.203,0.988,4.779,0.988,6.981,0c2.57-1.151,63.637-28.798,125.683-80.146
+          c36.618-30.304,65.836-62.565,86.845-95.889C498.548,263.271,512,219.394,512,174.936
+          C512,137.911,498.388,101.305,474.655,74.503z"/>
+      </svg>
+      <p class="qk-click-hint">👆 CLICK THE HEART MANY TIMES 👆</p>
+    </div>
+    <div class="qk-meter-section">
+      <div class="qk-meter-label">💖 MY LOVE FOR YOU METER™ 💖</div>
+      <div class="qk-track">
+        <div class="qk-fill" id="qk-fill">
+          <span class="qk-fill-text" id="qk-fill-text"></span>
+        </div>
+      </div>
+      <span class="qk-meter-emoji" id="qk-meter-emoji">🤍</span>
+    </div>
+    <div class="qk-btns">
+      <a href="https://m.me/100011457304911?ref=I_Love_You_Too" class="qk-btn-yes">
+        💍 YES I ACCEPT YOUR LOVE 💍
+      </a>
+      <div class="qk-no-zone">
+        <button class="qk-btn-no" id="qk-no-btn">no thanks</button>
+      </div>
+    </div>
+    <div class="qk-facts">
+      <h3>📋 REASONS YOU SHOULD LIKE ME BACK 📋</h3>
+      <div class="qk-fact"><span class="qk-fact-icon">✅</span><span>I remembered to brush my teeth today (probably)</span></div>
+      <div class="qk-fact"><span class="qk-fact-icon">✅</span><span>I think about you every 47 seconds. Scientists say that's a lot.</span></div>
+      <div class="qk-fact"><span class="qk-fact-icon">✅</span><span>I once ate a whole pizza while thinking of you. Dedication.</span></div>
+      <div class="qk-fact"><span class="qk-fact-icon">✅</span><span>My dog would like you. My dog hates everyone. This is huge.</span></div>
+      <div class="qk-fact"><span class="qk-fact-icon">✅</span><span>I googled "how to impress your crush" and then closed the tab and wrote this instead.</span></div>
+    </div>
+  </div>
+  <div class="qk-toast" id="qk-toast"></div>
+</div>
+
+<script>
+(function () {
+  /* ─── URL param routing: ?v=mature | ?v=genz | ?v=quirky ─── */
+  var params  = new URLSearchParams(window.location.search);
+  var urlV    = params.get('v');
+  var VALID   = { mature: true, genz: true, quirky: true };
+  var current = (urlV && VALID[urlV]) ? urlV : 'quirky';
+
+  var panels  = {
+    mature: document.getElementById('v-mature'),
+    genz:   document.getElementById('v-genz'),
+    quirky: document.getElementById('v-quirky')
+
+  };
+  var menuBtns = document.querySelectorAll('#v-widget-menu button');
+
+  function switchTo(v) {
+    Object.keys(panels).forEach(function (k) {
+      panels[k].classList.toggle('active', k === v);
+    });
+    menuBtns.forEach(function (b) {
+      b.classList.toggle('vm-active', b.getAttribute('data-v') === v);
+    });
+    current = v;
+    // update URL without reloading
+    var url = new URL(window.location.href);
+    url.searchParams.set('v', v);
+    history.replaceState(null, '', url.toString());
+    window.scrollTo(0, 0);
+    // close widget menu
+    document.getElementById('v-widget-menu').classList.remove('open');
+    if (v === 'mature') initMature();
+    if (v === 'genz')   initGenz();
+    if (v === 'quirky') initQuirky();
+    if(v=='og') window.location.href = "./send_this_to_your-crush.html"
+  }
+
+  /* apply initial version (clears the default active on quirky panel if URL says otherwise) */
+  Object.keys(panels).forEach(function (k) { panels[k].classList.remove('active'); });
+  switchTo(current);
+
+  /* ─── widget toggle ─── */
+  document.getElementById('v-widget-toggle').addEventListener('click', function (e) {
+    e.stopPropagation();
+    document.getElementById('v-widget-menu').classList.toggle('open');
+  });
+  document.addEventListener('click', function () {
+    document.getElementById('v-widget-menu').classList.remove('open');
+  });
+  document.getElementById('v-widget-menu').addEventListener('click', function (e) {
+    e.stopPropagation();
+    var v = e.target.getAttribute('data-v');
+    if (v) switchTo(v);
+  });
+
+  /* ════════════════ MATURE init ════════════════ */
+  var matureInited = false;
+  function initMature() {
+    if (matureInited) return; matureInited = true;
+    var wrap = document.getElementById('m-particles');
+    for (var i = 0; i < 22; i++) {
+      var d = document.createElement('div');
+      d.className = 'm-particle';
+      d.style.left              = Math.random() * 100 + '%';
+      d.style.width             = d.style.height = (Math.random() * 4 + 2) + 'px';
+      d.style.animationDuration = (Math.random() * 12 + 8) + 's';
+      d.style.animationDelay    = '-' + (Math.random() * 14) + 's';
+      d.style.opacity           = Math.random() * .6 + .2;
+      wrap.appendChild(d);
+    }
+    document.getElementById('m-measure-btn').addEventListener('click', function () {
+      document.getElementById('m-fill').style.width    = '100%';
+      document.getElementById('m-pct-label').textContent = '∞';
+      document.getElementById('m-pct-sub').textContent   = 'Unmeasurable. That\'s the honest answer.';
+      this.textContent     = 'There it is.';
+      this.style.pointerEvents = 'none';
+      this.style.opacity       = '.5';
+    });
+  }
+
+  /* ════════════════ GEN Z init ════════════════ */
+  var genzInited = false;
+  function initGenz() {
+    if (genzInited) return; genzInited = true;
+    document.getElementById('gz-check-btn').addEventListener('click', function () {
+      document.getElementById('gz-fill').style.width  = '100%';
+      document.getElementById('gz-pct').textContent   = '999% compatible fr';
+      this.textContent     = 'we ate. 🍽️';
+      this.style.opacity   = '.5';
+      this.style.pointerEvents = 'none';
+    });
+    var reacts = document.querySelectorAll('.gz-react');
+    var label  = document.getElementById('gz-react-label');
+    reacts.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        reacts.forEach(function (b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        label.textContent = 'you said: "' + btn.getAttribute('data-label') + '" — valid.';
+      });
+    });
+  }
+
+  /* ════════════════ QUIRKY init ════════════════ */
+  var quirkyInited = false;
+  var qkClicks   = 0;
+  var qkNoClicks = 0;
+  var qkEmojis   = ['🤍','🩷','💗','💓','💖','💝','💞','💘','💟','❤️‍🔥'];
+  var qkNoLines  = [
+    'you sure? really sure?', '...still sure?',
+    'what if i sent memes tho', 'ok fine but i\'m telling my cat',
+    'my cat is disappointed in you', 'this button is getting smaller btw',
+    'ok it\'s very small now', 'can you even read this',
+    '👁️👄👁️', 'FINE. you win. i\'ll just cry a lil'
+  ];
+  var qkToastMsgs = [
+    'love +1 deposited 💸', 'crushing intensifies 💓',
+    'butterflies confirmed 🦋', 'chemistry detected ⚗️',
+    'bro is down BAD', 'sending feelings via wifi 📶',
+    'heart.exe has crashed (in a good way)'
+  ];
+  var qkToastTimer;
+
+  function showQkToast(msg) {
+    var t = document.getElementById('qk-toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(qkToastTimer);
+    qkToastTimer = setTimeout(function () { t.classList.remove('show'); }, 2400);
+  }
+
+  function initQuirky() {
+    if (quirkyInited) return; quirkyInited = true;
+
+    /* confetti dots */
+    var confWrap = document.getElementById('qk-confetti');
+    var colors   = ['#ff0066','#ff69b4','#ffcc00','#00ccff','#a259ff','#ff9900'];
+    for (var i = 0; i < 35; i++) {
+      var dot = document.createElement('div');
+      dot.className = 'qk-dot';
+      var sz = Math.random() * 10 + 5;
+      dot.style.cssText = [
+        'width:' + sz + 'px', 'height:' + sz + 'px',
+        'left:' + Math.random() * 100 + '%',
+        'background:' + colors[Math.floor(Math.random() * colors.length)],
+        'animation-duration:' + (Math.random() * 6 + 4) + 's',
+        'animation-delay:-' + (Math.random() * 8) + 's',
+        'opacity:' + (Math.random() * .6 + .3)
+      ].join(';');
+      confWrap.appendChild(dot);
+    }
+
+    /* heart click game */
+    document.getElementById('qk-heart').addEventListener('click', function (e) {
+      qkClicks = Math.min(qkClicks + 1, 10);
+      var pct = qkClicks * 10;
+      document.getElementById('qk-fill').style.width        = pct + '%';
+      document.getElementById('qk-fill-text').textContent   = qkClicks < 10 ? pct + '%' : 'INFINITE ♾️';
+      document.getElementById('qk-meter-emoji').textContent = qkEmojis[qkClicks - 1] || '❤️‍🔥';
+      showQkToast(qkToastMsgs[Math.floor(Math.random() * qkToastMsgs.length)]);
+
+      /* spawn floating heart at click position */
+      var fh = document.createElement('div');
+      fh.className   = 'qk-float-heart';
+      fh.textContent = ['💗','💖','💘','💝','💞'][Math.floor(Math.random() * 5)];
+      fh.style.left  = e.clientX + 'px';
+      fh.style.top   = (e.clientY + window.scrollY) + 'px';
+      fh.style.animationDuration = (Math.random() * 1 + 1.2) + 's';
+      document.body.appendChild(fh);
+      setTimeout(function () { if (fh.parentNode) fh.parentNode.removeChild(fh); }, 2200);
+    });
+
+    /* shrinking no button */
+    document.getElementById('qk-no-btn').addEventListener('click', function () {
+      qkNoClicks++;
+      if (qkNoClicks < qkNoLines.length) {
+        var scale       = Math.max(0.35, 1 - qkNoClicks * 0.07);
+        this.style.transform = 'scale(' + scale + ')';
+        this.style.opacity   = Math.max(0.25, 1 - qkNoClicks * 0.08) + '';
+        this.textContent     = qkNoLines[qkNoClicks - 1];
+        showQkToast(qkNoLines[qkNoClicks - 1]);
+      } else {
+        this.style.display = 'none';
+        showQkToast('fine. i respect your decision. (i don\'t)');
+      }
+    });
+  }
+
+  /* init on load based on resolved version */
+  if (current === 'mature') initMature();
+  if (current === 'genz')   initGenz();
+  if (current === 'quirky') initQuirky();
+})();
+</script>
+</body>
+</html>
